@@ -57,8 +57,8 @@ const int ALPHA_CUT_EV = 2;
 
 const int EMPTY = 0;
 const int EXACT = 1;
-const int ALPHA = 2;
-const int BETA = 3;
+const int LOWERBOUND = 2;
+const int UPPERBOUND = 3;
 
 const int MIN_DEPTH = 2;
 
