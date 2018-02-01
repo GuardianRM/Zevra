@@ -11,6 +11,7 @@ class Hash {
 public:
 	uint8_t depth;
 	int32_t score;
+
 	uint8_t flag;
 	uint16_t age;
 	uint64_t key;
