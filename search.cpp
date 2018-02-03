@@ -107,7 +107,7 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 
 	int opposiing_pieces = (color == WHITE ? b.popcount64(b.currentState.black_bit_mask) : b.popcount64(b.currentState.white_bit_mask));
 
-	if(!extended && !inCheck &&  !inNullMove && depth < 10 && !onPV && opposiing_pieces > 3) { //Razoring
+	if(!extended && !inCheck &&  !inNullMove && depth <= 3 && !onPV && opposiing_pieces > 3) { //Razoring
 		if(b.getEvaluate() - RAZOR_MARGIN[depth] >= beta) {
 			return beta;
 		}
@@ -119,7 +119,7 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 	sortAttacks(moveArray[real_depth]);
 	sortMoves(moveArray[real_depth], real_depth);
 
-	if(cut) { //Multi-Cut
+	/*if(cut) { //Multi-Cut
 		if (depth >= 4 && real_depth > 0 && !inCheck && !inNullMove && !extensions && beta - alpha <= 1 && !b.currentState.attacked) {
 			int c = 0;
 			for (int i = 0; i < std::min((int)moveArray[real_depth].count, 4); ++i) {
@@ -139,7 +139,7 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 				}
 			}
 		}
-	}
+	}*/
 
 	int R = 2 + depth / 6;
 	
@@ -198,13 +198,13 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 				nextDepth -= reduction;
 			}
 
-			if(nextDepth <= 2) {
+			/*if(nextDepth <= 2) {
 				if(-b.getEvaluate() + PAWN_EV.mg / 2 <= alpha) {
 					++nodesCounter;
 					b.goBack();
 					continue;
 				}
-			}
+			}*/
 		}
 
 		if(num_moves == 1) {
