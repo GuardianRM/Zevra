@@ -97,7 +97,7 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 
 	int opposiing_pieces = (color == WHITE ? b.popcount64(b.currentState.black_bit_mask) : b.popcount64(b.currentState.white_bit_mask));
 
-	if(!extended && !inCheck &&  !inNullMove && depth <= 3 && !onPV && opposiing_pieces > 3) { //Razoring
+	if(!extended && !inCheck &&  !inNullMove && depth < 10 && !onPV && opposiing_pieces > 3) { //Razoring
 		if(b.getEvaluate() - RAZOR_MARGIN[depth] >= beta) {
 			//rn1qr1k1/1p2bppp/p3p3/3pP3/P2P1B2/2RB1Q1P/1P3PP1/R5K1 w - - 0 1
 			return quies(b, alpha, beta, rule, real_depth);
@@ -132,7 +132,7 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 		}
 	}
 
-	int R = 2 + depth / 6;
+	/*int R = 2 + depth / 6;
 	
 	if(!inNullMove && !extended && !inCheck && !onPV && depth > R && (b.popcount64(b.currentState.white_bit_mask | b.currentState.black_bit_mask) > 6) && real_depth > 0) {
 		b.makeNullMove();
@@ -142,7 +142,7 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 			return value;
 		}
 		b.unMakeNullMove();
-	}
+	}*/
 
 	BitMove local_move;
 
@@ -180,6 +180,7 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 		nextDepth = depth - 1;
 		nextDepth += extensions;
 		double reduction = 0;
+		//r1b1k2N/ppp1q1pp/2n2n2/8/Q7/2N1b3/PPP2PPP/R3KB1R b KQq - 0 11
 
 		if(!b.inCheck(enemyColor) && !extensions && !inNullMove && !moveArray[real_depth].moveArray[i].isAttack && !onPV && !inCheck) {
 			++low_moves_count;
