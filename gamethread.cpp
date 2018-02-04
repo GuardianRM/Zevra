@@ -125,9 +125,9 @@ void Game::goFixedTime(int64_t tm, bool tournamentTimeControll) {
 
 
 
-		f = negamax(game_board, -WHITE_WIN, WHITE_WIN, max_depth, 0, FIXED_TIME, false, true);
+		//f = negamax(game_board, -WHITE_WIN, WHITE_WIN, max_depth, 0, FIXED_TIME, false, true);
 		
-		/*int alpha = -WHITE_WIN;
+		int alpha = -WHITE_WIN;
 		int beta = WHITE_WIN;
 
 		for(;;) {
@@ -139,12 +139,12 @@ void Game::goFixedTime(int64_t tm, bool tournamentTimeControll) {
 			} else {
 				break;
 			}
-		}*/
-/*
-		int upperbound = WHITE_WIN;
-		int lowerbound = -WHITE_WIN;*/
+		}
 
-		/*while(lowerbound < upperbound) {
+		/*int upperbound = WHITE_WIN;
+		int lowerbound = -WHITE_WIN;
+
+		while(lowerbound < upperbound) {
 			int b = std::max(f, lowerbound + 1);
 			f = negamax(game_board, b - 1, b, max_depth, 0, FIXED_TIME, false, true);
 

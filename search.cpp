@@ -12,17 +12,25 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 
 	int64_t oldAlpha = alpha;
 
-	if((currentHash->flag != EMPTY && currentHash->key == hash) && real_depth > 2) {
+	if((/*currentHash->flag != EMPTY &&*/ currentHash->key == hash)) {
 		if(real_depth > 0 && currentHash->depth >= depth) {
 			int upperbound = currentHash->upperbound;
 			int lowerbound = currentHash->lowerbound;
 
+			//7k/3P2r1/p6p/P1p2p2/3b1PnP/1Q3R1K/1P2q3/7R b - - 0 1
 
-			/*if(score > WHITE_WIN - 100) {
-				score -= real_depth;
-			} else if(score < -WHITE_WIN + 100) {
-				score += real_depth;
-			}*/
+
+			if(upperbound > WHITE_WIN - 100) {
+				upperbound -= real_depth;
+			} else if(upperbound < -WHITE_WIN + 100) {
+				upperbound += real_depth;
+			}
+
+			if(lowerbound > WHITE_WIN - 100) {
+				lowerbound -= real_depth;
+			} else if(lowerbound < -WHITE_WIN + 100) {
+				lowerbound += real_depth;
+			}
 
 			if(lowerbound >= beta) {
 				return lowerbound;
@@ -100,7 +108,7 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 	if(!extended && !inCheck &&  !inNullMove && depth < 10 && !onPV && opposiing_pieces > 3) { //Razoring
 		if(b.getEvaluate() - RAZOR_MARGIN[depth] >= beta) {
 			//rn1qr1k1/1p2bppp/p3p3/3pP3/P2P1B2/2RB1Q1P/1P3PP1/R5K1 w - - 0 1
-			return quies(b, alpha, beta, rule, real_depth);
+			return beta;
 		}
 	}
 
@@ -132,7 +140,7 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 		}
 	}
 
-	/*int R = 2 + depth / 6;
+	int R = 2 + depth / 6;
 	
 	if(!inNullMove && !extended && !inCheck && !onPV && depth > R && (b.popcount64(b.currentState.white_bit_mask | b.currentState.black_bit_mask) > 6) && real_depth > 0) {
 		b.makeNullMove();
@@ -142,7 +150,7 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 			return value;
 		}
 		b.unMakeNullMove();
-	}*/
+	}
 
 	BitMove local_move;
 
@@ -241,7 +249,7 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 					blackKiller[real_depth] = Killer(local_move);
 				}
 			}
-			break;
+			return beta;
 		}
 	}
 
@@ -282,7 +290,7 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 		}
 	}
 
-	return eval;
+	return alpha;
 }
 
 uint64_t Game::perft(int depth) {
