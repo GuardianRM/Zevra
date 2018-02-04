@@ -31,9 +31,6 @@ private:
 	BitBoard game_board;
 	unsigned long long nodesCounter = 0;
 
-	const int WHITE_WIN = 1000000;
-	const int BLACK_WIN = -1000000;
-
 	int64_t max_depth;
 	bool stopped;
 

@@ -60,8 +60,12 @@ const int TOURNAMENT = 2; //турнирный режим
 //Типы оценки в хеш-таблице
 const int EMPTY = 0;
 const int EXACT = 1;
-const int ALPHA = 2;
-const int BETA = 3;
+const int LOWERBOUND = 2;
+const int UPPERBOUND = 3;
+
+//Границы оценки
+const int WHITE_WIN = 1000000;
+const int BLACK_WIN = -1000000;
 
 // Таблицы PST
 

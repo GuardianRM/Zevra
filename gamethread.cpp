@@ -83,7 +83,7 @@ void Game::goFixedTime(int64_t tm, bool tournamentTimeControll) {
 
 	std::vector<BitMove> bestPV;
 
-	int f = game_board.getEvaluate();
+	int f = 0;
 
 
 	//4k3/8/8/8/8/8/8/4KNNN w - - 0 1
@@ -92,9 +92,9 @@ void Game::goFixedTime(int64_t tm, bool tournamentTimeControll) {
 		flattenHistory();
 
 		if(tournamentTimeControll) {
-			if(timer.getTime() * 2 >= time) {
+			/*if(timer.getTime() * 2 >= time) {
 				break;
-			}
+			}*/
 
 			if(max_depth == 1) {
 				game_board.bitBoardMoveGenerator(moveArray[0], stress);
@@ -145,9 +145,9 @@ void Game::goFixedTime(int64_t tm, bool tournamentTimeControll) {
 			f = negamax(game_board, b - 1, b, max_depth, 0, FIXED_TIME, false, true);
 
 			if(f < b) {
-				upperbound = f - 50;
+				upperbound = f;
 			} else {
-				lowerbound = f + 50;
+				lowerbound = f;
 			}
 		}
 

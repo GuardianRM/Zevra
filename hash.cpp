@@ -1,6 +1,8 @@
 #include "hash.hpp"
 
-Hash::Hash() :/* prev(nullptr),*/ flag(EMPTY), age(0) {}
+Hash::Hash() :/* prev(nullptr),*/ age(0) {
+	clean();
+}
 
 Hash::~Hash() {
 	clean();
@@ -40,6 +42,9 @@ void Hash::clean() {
 	}*/
 
 	flag = EMPTY;
+	lowerbound = -WHITE_WIN;
+	upperbound = WHITE_WIN;
+
 }
 
 void Hash::setMove(BitMove& mv) {

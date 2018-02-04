@@ -14,40 +14,30 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 
 	if((currentHash->flag != EMPTY && currentHash->key == hash) && real_depth > 2) {
 		if(real_depth > 0 && currentHash->depth >= depth) {
-			int score = currentHash->score;
+			int upperbound = currentHash->upperbound;
+			int lowerbound = currentHash->lowerbound;
 
 
-			if(score > WHITE_WIN - 100) {
+			/*if(score > WHITE_WIN - 100) {
 				score -= real_depth;
 			} else if(score < -WHITE_WIN + 100) {
 				score += real_depth;
-			}
-
-			if(currentHash->flag == ALPHA) {
-				beta = std::min((int)beta, score);
-			} else if(currentHash->flag == BETA) {
-				alpha = std::max((int)alpha, score);
-			} else {
-				return score;
-			}
-
-			if(alpha >= beta) {
-				return score;
-			}
-
-
-/*
-			if(currentHash->flag == BETA) {
-				alpha = std::max((int64_t)alpha, (int64_t)score);
-			} else if(currentHash->flag == ALPHA) {
-				beta = std::min((int64_t)beta, (int64_t)score);
-			} else if(currentHash->flag == EXACT) {
-				return score;
-			}
-
-			if(alpha >= beta) {
-				return score;
 			}*/
+
+			if(lowerbound >= beta) {
+				return lowerbound;
+			}
+
+			if(upperbound <= alpha) {
+				return upperbound;
+			}
+
+			alpha = std::max((int)alpha, lowerbound);
+			beta = std::min((int)beta, upperbound);
+
+			if(alpha >= beta) {
+				return beta;
+			}
 		}
 	}
 
@@ -109,7 +99,8 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 
 	if(!extended && !inCheck &&  !inNullMove && depth <= 3 && !onPV && opposiing_pieces > 3) { //Razoring
 		if(b.getEvaluate() - RAZOR_MARGIN[depth] >= beta) {
-			return beta;
+			//rn1qr1k1/1p2bppp/p3p3/3pP3/P2P1B2/2RB1Q1P/1P3PP1/R5K1 w - - 0 1
+			return quies(b, alpha, beta, rule, real_depth);
 		}
 	}
 
@@ -119,7 +110,7 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 	sortAttacks(moveArray[real_depth]);
 	sortMoves(moveArray[real_depth], real_depth);
 
-	/*if(cut) { //Multi-Cut
+	if(cut) { //Multi-Cut
 		if (depth >= 4 && real_depth > 0 && !inCheck && !inNullMove && !extensions && beta - alpha <= 1 && !b.currentState.attacked) {
 			int c = 0;
 			for (int i = 0; i < std::min((int)moveArray[real_depth].count, 4); ++i) {
@@ -139,7 +130,7 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 				}
 			}
 		}
-	}*/
+	}
 
 	int R = 2 + depth / 6;
 	
@@ -198,13 +189,13 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 				nextDepth -= reduction;
 			}
 
-			/*if(nextDepth <= 2) {
+			if(nextDepth <= 2) {
 				if(-b.getEvaluate() + PAWN_EV.mg / 2 <= alpha) {
 					++nodesCounter;
 					b.goBack();
 					continue;
 				}
-			}*/
+			}
 		}
 
 		if(num_moves == 1) {
@@ -262,16 +253,12 @@ int64_t Game::negamax(BitBoard & b, int64_t alpha, int64_t beta, int depth, int 
 	}
 
 	if(eval <= oldAlpha) {
-		recordHash(depth, eval, ALPHA, hash, local_move, real_depth);
+		recordHash(depth, eval, UPPERBOUND, hash, local_move, real_depth);
 	} else if(eval > oldAlpha && eval < beta) {
 		recordHash(depth, eval, EXACT, hash, local_move, real_depth);
 	} else {
-		recordHash(depth, eval, BETA, hash, local_move, real_depth);
+		recordHash(depth, eval, LOWERBOUND, hash, local_move, real_depth);
 	}
-
-	/*if(alpha == oldAlpha) {
-		recordHash(depth, eval, ALPHA, hash, local_move, real_depth);
-	}*/
 
 	if(real_depth == 0) {
 		if((rule == FIXED_TIME && timer.getTime() >= time) || stopped) {
@@ -384,9 +371,9 @@ bool Game::recordHash(int depth, int score, int flag, uint64_t key, BitMove move
 
 	Hash* hash = &boardHash[key & hash_cutter];
 
-	if(flag == ALPHA && (hash->flag == EXACT || hash->flag == BETA)) {
+	/*if(flag == ALPHA && (hash->flag == EXACT || hash->flag == BETA)) {
 		return false;
-	}
+	}*/
 
 	if((hash->flag != EMPTY) && hash->depth > depth && hash->age == hashAge) {
 		return false;
@@ -403,14 +390,21 @@ bool Game::recordHash(int depth, int score, int flag, uint64_t key, BitMove move
 	}
 
 	hash->depth = depth;
-	hash->score = score;
+
+	if(flag == LOWERBOUND) {
+		hash->lowerbound = score;
+	} else if(flag == UPPERBOUND) {
+		hash->upperbound = score;
+	} else {
+		hash->lowerbound = score;
+		hash->upperbound = score;
+	}
+
 	hash->flag = flag;
 	hash->key = key;
 	hash->age = hashAge;
 
-	if(flag != ALPHA) {
-		hash->setMove(move);
-	}
+	hash->setMove(move);
 
 	return true;
 }
@@ -426,7 +420,7 @@ std::vector<BitMove> Game::extractPV(int depth) {
 		uint64_t hash = game_board.getColorHash();
 		Hash* currentHash = &boardHash[hash & hash_cutter];
 
-		if(currentHash->flag == EXACT || currentHash->flag == BETA) {
+		if(currentHash->flag != EMPTY) {
 			game_board.bitBoardMoveGenerator(moves, stress);
 
 			bool enable;
