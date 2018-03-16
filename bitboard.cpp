@@ -1859,8 +1859,14 @@ double BitBoard::newEvaluateAll() {
 	uint64_t occu = (currentState.piece_bit_mask[whiteSide] | currentState.piece_bit_mask[!whiteSide]);
 	int pieces_count = popcount64(occu);
 
-	if(pieces_count <= 3) {
-		if(white_bishop_count == 1 || black_bishop_count == 1 || white_knight_count == 1 || black_knight_count == 1 || pieces_count < 3) {
+	int drawvalue = (white_bishop_count + black_bishop_count + white_knight_count + black_knight_count);
+	int knightdrawvalue = (white_knight_count + black_knight_count);
+	
+	if(pieces_count <= 5) 
+	{
+		if( drawvalue <= 1 || (knightdrawvalue <= 4 && drawvalue == knightdrawvalue) 
+		                   || pieces_count < 3) 
+		{
 			return 0;
 		}
 	}
