@@ -1862,12 +1862,12 @@ double BitBoard::newEvaluateAll() {
 	int drawvalue = (white_bishop_count + black_bishop_count + white_knight_count + black_knight_count);
 	int knightdrawvalue = (white_knight_count + black_knight_count);
 	
-	if(pieces_count <= 5) 
+	if(pieces_count <= 6) 
 	{
-		if( drawvalue <= 1 || (knightdrawvalue <= 4 && drawvalue == knightdrawvalue) 
+		if( drawvalue <= 1 || (drawvalue == knightdrawvalue) 
 		                   || pieces_count < 3) 
 		{
-			return 0;
+		    return 0;
 		}
 	}
 
@@ -2003,65 +2003,81 @@ double BitBoard::newEvaluateAll() {
 
 	mask = currentState.figures[ROOK] & currentState.piece_bit_mask[!whiteSide];
 
-	while(mask != 0) {
+	while(mask != 0) 
+	{
 		uint8_t pos = firstOne(mask);
 		result -= (kingSecurityArray[white_king_pos][pos] * 4);
+		result += (kingSecurityArray[black_king_pos][pos] * 2);
 		mask &= ~vec1_cells[pos];
 	}
 
 	mask = currentState.figures[QUEEN] & currentState.piece_bit_mask[!whiteSide];
 	
-	while(mask != 0) {
+	while(mask != 0) 
+	{
 		uint8_t pos = firstOne(mask);
 		result -= (kingSecurityArray[white_king_pos][pos] * 6);
+		result += (kingSecurityArray[black_king_pos][pos] * 2);
 		mask &= ~vec1_cells[pos];
 	}
 
 	mask = currentState.figures[KNIGHT] & currentState.piece_bit_mask[!whiteSide];
 	
-	while(mask != 0) {
+	while(mask != 0) 
+	{
 		uint8_t pos = firstOne(mask);
 		result -= (kingSecurityArray[white_king_pos][pos] * 2);
+		result += (kingSecurityArray[black_king_pos][pos] * 2);
 		mask &= ~vec1_cells[pos];
 	}
 
 	mask = currentState.figures[BISHOP] & currentState.piece_bit_mask[!whiteSide];
 	
-	while(mask != 0) {
+	while(mask != 0) 
+	{
 		uint8_t pos = firstOne(mask);
 		result -= (kingSecurityArray[white_king_pos][pos] * 1);
+		result += (kingSecurityArray[black_king_pos][pos] * 2);
 		mask &= ~vec1_cells[pos];
 	}
 
 	mask = currentState.figures[ROOK] & currentState.piece_bit_mask[whiteSide];
 	
-	while(mask != 0) {
+	while(mask != 0) 
+	{
 		uint8_t pos = firstOne(mask);
 		result += (kingSecurityArray[black_king_pos][pos] * 4);
+		result -= (kingSecurityArray[white_king_pos][pos] * 2);
 		mask &= ~vec1_cells[pos];
 	}
 
 	mask = currentState.figures[QUEEN] & currentState.piece_bit_mask[whiteSide];
 	
-	while(mask != 0) {
+	while(mask != 0) 
+	{
 		uint8_t pos = firstOne(mask);
 		result += (kingSecurityArray[black_king_pos][pos] * 6);
+		result -= (kingSecurityArray[white_king_pos][pos] * 2);
 		mask &= ~vec1_cells[pos];
 	}
 
 	mask = currentState.figures[KNIGHT] & currentState.piece_bit_mask[whiteSide];
 	
-	while(mask != 0) {
+	while(mask != 0) 
+	{
 		uint8_t pos = firstOne(mask);
 		result += (kingSecurityArray[black_king_pos][pos] * 2);
+		result -= (kingSecurityArray[white_king_pos][pos] * 2);
 		mask &= ~vec1_cells[pos];
 	}
 
 	mask = currentState.figures[BISHOP] & currentState.piece_bit_mask[whiteSide];
 	
-	while(mask != 0) {
+	while(mask != 0) 
+	{
 		uint8_t pos = firstOne(mask);
 		result += (kingSecurityArray[black_king_pos][pos] * 1);
+		result -= (kingSecurityArray[white_king_pos][pos] * 2);
 		mask &= ~vec1_cells[pos];
 	}
 
