@@ -16,7 +16,6 @@ using S = Score;
 bool is_input_available();
 
 // Битовое обозначение фигур
-
 const uint8_t PAWN = 1;    //00000001
 const uint8_t KNIGHT = 2;  //00000010
 const uint8_t BISHOP = 3;  //00000011
@@ -31,7 +30,6 @@ const uint8_t BLACK = 16;  //00010000
 // Маски фигур (для разделения фигуры и цвета)
 const uint8_t COLOR_SAVE = 24;  //00011000
 const uint8_t TYPE_SAVE = 7; //00000111
-
 
 const int BOARD_SIZE = 8;
 const bool whiteSide = true;
@@ -146,17 +144,37 @@ const double RAZOR_MARGIN[10] = {0, 10, 50, 200, 500, 750, 1000, 1500, 2000, 250
 // Бонусы
 const double IsolatedPawnBonus = -15; // изолированные пешки
 const double DoubleBishopsBonus = 30; // бонус за 2-х слонов
-const double PassedPawnBonus[BOARD_SIZE] = {0, 10, 20, 30, 40, 60, 80, 0}; //Бонус проходных пешек
 const double KnightMobilityBonus[9] = {-44, -32, -31, -4, 3, 7, 14, 17, 20};
 const double BishopMobilityBonus[14] = {-31, -12, 5, 15, 18, 23, 26, 30, 32, 35, 38, 41, 44, 47};
 const double RookMobilityBonus[15] = {-35, -30, -25, -20, -10, -5, 5, 10, 15, 23, 30, 36, 42, 50};
 const double QueenMobilityBonus[28] = {-15, -10, 3, 4, 6, 9, 12, 15, 20, 25, 30, 35, 38, 41, 44, 47, 50, 52, 54, 56, 58, 60, 62, 64, 65, 66, 67, 68};
 const double DualPawnBonus[9] = {0, 0, -5, -10, -15, -15, -15, -15, -15};
+const double PassedPawnBonus[BOARD_SIZE] = {0, 10, 20, 30, 40, 60, 80, 0}; //Бонус проходных пешек
+
+// KingProtector[PieceType-2] contains a penalty according to distance from king
+const Score KingProtector[] = { 2, 3, 2, 0) };
+const Score KingAttack[]    = { 2, 3, 2, 0) };
+
+uint8_t distance[BOARD_SIZE][BOARD_SIZE];
+
+void init_distance()
+{
+  int i, j;
+
+  for (i = 0; i < BOARD_SIZE; i ++)
+    for (j = 0; j < BOARD_SIZE; j ++)
+      distance[i][j] = _max(_abs(_rank(i) - _rank(j)), _abs(_file(i) - _file(j)));
+};
+
+{
+int piecetype;
+for (piecetype = KNIGHT; piecetype <= QUEEN; piecetype ++)
+}
 
 // Безопасность короля
 const double king_security[8] = {8, 7, 6, 5, 4, 3, 2, 1};
 const int SafetyTable[100] = {
-		0,  0,   1,   2,   3,   5,   7,   9,  12,  15,
+	 0,   0,   1,   2,   3,   5,   7,   9,  12,  15,
 	18,  22,  26,  30,  35,  39,  44,  50,  56,  62,
 	68,  75,  82,  85,  89,  97, 105, 113, 122, 131,
 	140, 150, 169, 180, 191, 202, 213, 225, 237, 248,
